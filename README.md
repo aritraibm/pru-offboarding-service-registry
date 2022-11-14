@@ -1,1 +1,2 @@
-# pru-offboarding-service-registry
+# pru-poc-service-registry
+service registry

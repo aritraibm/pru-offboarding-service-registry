@@ -1,0 +1,151 @@
+# Before running docker-compose make sure all below images are available
+# cmd : docker-compose up/down/pause
+# to install docker desktop : https://docs.docker.com/desktop/install/windows-install/
+version: "3"
+services:
+  associate_service:
+    image: associate-service
+    ports:
+      - "9092:9092"
+    networks:
+      vpcbr: 
+        ipv4_address: 10.5.0.11    
+    depends_on:
+      - cloud_config_service
+      - mongo_db
+    command: ["./wait-for-it.sh", "cloud_config_service:9296", "python", "app.py"]
+    restart: on-failure
+      
+  filemanager_service:
+    image: filemanager-service
+    ports:
+      - "9003:9003"
+    networks:
+      vpcbr: 
+        ipv4_address: 10.5.0.15
+    depends_on:
+      - cloud_config_service
+      - postgres_db
+    command: ["./wait-for-it.sh", "cloud_config_service:9296",  "python", "app.py"]
+    restart: on-failure:5
+        
+  onboarding_task_service:
+    image: onboarding-task-service
+    ports:
+      - "9094:9094"
+    networks:
+      vpcbr: 
+        ipv4_address: 10.5.0.10
+    depends_on:
+      - cloud_config_service
+      - mongo_db
+    command: ["./wait-for-it.sh", "cloud_config_service:9296",  "python", "app.py"]
+    restart: on-failure:5
+      
+  skill-service:
+    image: skill-service
+    ports:
+      - "9091:9091"
+    networks:
+      vpcbr: 
+        ipv4_address: 10.5.0.12
+    depends_on:
+      - cloud_config_service
+      - mongo_db
+    command: ["./wait-for-it.sh", "cloud_config_service:9296",  "python", "app.py"]
+    restart: on-failure:5
+
+  onboarding_associate_ui:
+    image: onboarding-associate-ui
+    ports:
+      - "3000:3000"    
+    networks:
+      vpcbr: 
+        ipv4_address: 10.5.0.13
+    depends_on:
+      - token_service
+    restart: on-failure:5
+
+  token_service:
+    image: token-service
+    ports:
+      - "9099:9099"
+    networks:
+      vpcbr: 
+        ipv4_address: 10.5.0.6
+    depends_on:
+      - cloud_config_service
+      - mongo_db
+    command: ["./wait-for-it.sh", "cloud_config_service:9296",  "python", "app.py"]
+    restart: on-failure:5
+  
+  cloud_gateway_service:
+    image: cloud-gateway-service
+    ports:
+      - "9191:9191"
+    networks:
+      vpcbr: 
+        ipv4_address: 10.5.0.8
+    depends_on:
+      - cloud_config_service
+    command: ["./wait-for-it.sh", "cloud_config_service:9296",  "python", "app.py"]
+    restart: on-failure:5
+
+  cloud_config_service:
+    image: cloud-config-service
+    ports:
+      - "9296:9296"
+    networks:
+      vpcbr: 
+        ipv4_address: 10.5.0.9
+    depends_on:
+      - service_registry
+    command: ["./wait-for-it.sh", "service_registry:8761",  "python", "app.py"]
+    restart: on-failure
+  
+  service_registry:
+    image: service-registry
+    ports:
+      - "8761:8761"
+    networks:
+      vpcbr: 
+        ipv4_address: 10.5.0.5
+    depends_on:
+      - mongo_db
+    command: ["./wait-for-it.sh", "mongo_db:27017",  "python", "app.py"]
+    restart: "no"
+
+  mongo_db:
+    image: 4130848d45a9
+    volumes:
+      - mongodb-data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      vpcbr: 
+        ipv4_address: 10.5.0.7
+    restart: "no"
+
+  postgres_db:
+    image: f8dd270e5152
+    environment:
+      POSTGRES_PASSWORD: admin
+      POSTGRES_USER: postgres
+    ports:
+      - "5432:5432"
+    networks:
+      vpcbr: 
+        ipv4_address: 10.5.0.14
+    restart: "no"
+
+volumes:
+  mongodb-data:
+    name: mongodb-data
+
+networks:
+  vpcbr:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 10.5.0.0/16
+         gateway: 10.5.0.1
