@@ -1,4 +1,4 @@
-package com.pru.offboarding.serviceregistry;
+package com.pru.test.serviceregistry;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,4 +1,4 @@
-package com.pru.offboarding.serviceregistry;
+package com.pru.test.serviceregistry;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
