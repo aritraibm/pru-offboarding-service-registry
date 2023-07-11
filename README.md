@@ -1,2 +1,2 @@
 # pru-poc-service-registry
-service registry
+Eureka service registry

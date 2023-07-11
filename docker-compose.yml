@@ -27,7 +27,7 @@ services:
       - cloud_config_service
       - postgres_db
     command: ["./wait-for-it.sh", "cloud_config_service:9296",  "python", "app.py"]
-    restart: on-failure:5
+    restart: on-failure
         
   onboarding_task_service:
     image: onboarding-task-service
@@ -40,7 +40,7 @@ services:
       - cloud_config_service
       - mongo_db
     command: ["./wait-for-it.sh", "cloud_config_service:9296",  "python", "app.py"]
-    restart: on-failure:5
+    restart: on-failure
       
   skill-service:
     image: skill-service
@@ -53,10 +53,10 @@ services:
       - cloud_config_service
       - mongo_db
     command: ["./wait-for-it.sh", "cloud_config_service:9296",  "python", "app.py"]
-    restart: on-failure:5
+    restart: on-failure
 
-  onboarding_associate_ui:
-    image: onboarding-associate-ui
+  offboarding_associate_ui:
+    image: offboarding-associate-ui
     ports:
       - "3000:3000"    
     networks:
@@ -64,7 +64,7 @@ services:
         ipv4_address: 10.5.0.13
     depends_on:
       - token_service
-    restart: on-failure:5
+    restart: on-failure
 
   token_service:
     image: token-service
@@ -77,7 +77,7 @@ services:
       - cloud_config_service
       - mongo_db
     command: ["./wait-for-it.sh", "cloud_config_service:9296",  "python", "app.py"]
-    restart: on-failure:5
+    restart: on-failure
   
   cloud_gateway_service:
     image: cloud-gateway-service
@@ -89,7 +89,7 @@ services:
     depends_on:
       - cloud_config_service
     command: ["./wait-for-it.sh", "cloud_config_service:9296",  "python", "app.py"]
-    restart: on-failure:5
+    restart: on-failure
 
   cloud_config_service:
     image: cloud-config-service
@@ -113,7 +113,6 @@ services:
     depends_on:
       - mongo_db
     command: ["./wait-for-it.sh", "mongo_db:27017",  "python", "app.py"]
-    restart: "no"
 
   mongo_db:
     image: 4130848d45a9
